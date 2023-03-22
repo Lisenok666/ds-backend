@@ -10,15 +10,6 @@ class PlateReaderClient:
         self.image_url = image_url
         self.images_for_numbers = list()
 
-    def load(self, imageID, res):
-        try:
-            res['result'] = res['result'].encode('ISO-8859-1')  
-            out = open(str(imageID) + '.jpg', "wb")
-            out.write(res['result'])
-            out.close()
-            self.images_for_numbers.append(str(imageID) + '.jpg')
-        except:
-            pass
 
     def read_plate_number(self, im):
         res = requests.post(
@@ -50,7 +41,6 @@ class PlateReaderClient:
             },
         )
         res = res.json()
-        self.load(imageID, res)
         return res
 
 
@@ -64,28 +54,9 @@ class PlateReaderClient:
             },
         )
         res = res.json()
-        for i, key in enumerate(res.keys()):
-            self.load(key.split('/')[-1], res[key])
         return res
 
 
-    def script(self , images):
-        if isinstance(images, int):
-            res = self.load_image(images)
-            print(res)
-            if len(self.images_for_numbers):
-                image = self.images_for_numbers.pop()
-                with open('./' + image, 'rb') as im:
-                    res = self.read_plate_number(im)
-                    print(res)
-        elif isinstance(images, list):
-            res = self.load_images(images)
-            print(res)
-            if len(self.images_for_numbers):
-                image = self.images_for_numbers.pop()
-                with open('./' + image, 'rb') as im:
-                    res = self.read_plate_number(im)
-                    print(res)
 
 
 
@@ -93,10 +64,10 @@ class PlateReaderClient:
 if __name__ == '__main__':
     client = PlateReaderClient(host='http://127.0.0.1:8080', image_url = 'http://51.250.83.169:7878/images/')
     print('TEST1')
-    client.script(9965)
+    res = client.load_image(9965)
+    print(res)
     print('TEST2')
-    client.script([9967, 10022])
-    # res = client.load_images([9967, 10022])
-    # print(res)
+    res = client.load_images([9967, 10022])
+    print(res)
 
 
