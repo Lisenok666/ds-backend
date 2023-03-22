@@ -98,6 +98,7 @@ def load_image():
     return ret
 
 
+# <url>:8080 : body: {"imagesID": ["http://51.250.83.169:7878/images/9999", "http://51.250.83.169:7878/images/10022"]}
 @app.route('/loadImages',methods = ['GET', 'POST'])
 def load_images():
     if request.method == "GET":
@@ -111,7 +112,6 @@ def load_images():
 
         imagesID = request.json['imagesID']
 
-    imagesID = request.json['imagesID']
     ret = {}
     for imageID in imagesID:
         temp = {}
