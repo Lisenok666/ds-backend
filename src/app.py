@@ -25,6 +25,19 @@ def function_load_images(imageID):
         'result': (response.content).decode('ISO-8859-1'),
     }
 
+def function_read_number(im):
+    im = io.BytesIO(im)
+
+    try:
+        res = plate_reader.read_text(im)
+    except InvalidImage:
+        logging.error('invalid image')
+        return {'error': 'invalid image'}, 400
+
+    return {
+        'plate_number': res,
+    }
+
 @app.route('/')
 def hello():
     user = request.args['user']
@@ -69,7 +82,13 @@ def load_image():
         return {'error': 'field "imageID" not found'}, 400
 
     imageID = request.json['imageID']
-    return  function_load_images(imageID)
+    ret = {}
+    ret['load'] = function_load_images(imageID)
+    try:
+        ret['number'] = function_read_number(ret['load']['result'].encode('ISO-8859-1'))
+    except:
+        ret['number'] = ret['load']
+    return ret
 
 
 @app.route('/loadImages',methods = ['POST'])
@@ -80,7 +99,13 @@ def load_images():
     imagesID = request.json['imagesID']
     ret = {}
     for imageID in imagesID:
-        ret[imageID] = function_load_images(imageID)
+        temp = {}
+        temp['load'] = function_load_images(imageID)
+        try:
+            temp['number'] = function_read_number(temp['load']['result'].encode('ISO-8859-1'))
+        except:
+           temp['number'] = temp['load']
+        ret[imageID] = temp
     return ret
     
 
