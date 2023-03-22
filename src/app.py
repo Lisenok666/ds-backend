@@ -76,12 +76,19 @@ def read_plate_number():
     }
 
 # <url>:8080 : body: {"imageID": "http://51.250.83.169:7878/images/10022"}
-@app.route('/loadImage',methods = ['POST'])
+@app.route('/loadImage',methods = ['GET', 'POST'])
 def load_image():
-    if 'imageID' not in request.json:
-        return {'error': 'field "imageID" not found'}, 400
+    if request.method == "GET":
+        if 'imageID' not in request.args:
+            return {'error': 'field "imageID" not found'}, 400
 
-    imageID = request.json['imageID']
+        imageID = request.args['imageID']
+    else:
+        if 'imageID' not in request.json:
+            return {'error': 'field "imageID" not found'}, 400
+
+        imageID = request.json['imageID']
+
     ret = {}
     ret['load'] = function_load_images(imageID)
     try:
@@ -91,10 +98,18 @@ def load_image():
     return ret
 
 
-@app.route('/loadImages',methods = ['POST'])
+@app.route('/loadImages',methods = ['GET', 'POST'])
 def load_images():
-    if 'imagesID' not in request.json:
-        return {'error': 'field "imagesID" not found'}, 400
+    if request.method == "GET":
+        if 'imagesID' not in request.args:
+            return {'error': 'field "imagesID" not found'}, 400
+
+        imagesID = request.args['imagesID']
+    else:
+        if 'imagesID' not in request.json:
+            return {'error': 'field "imagesID" not found'}, 400
+
+        imagesID = request.json['imagesID']
 
     imagesID = request.json['imagesID']
     ret = {}
